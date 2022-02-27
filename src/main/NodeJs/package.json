@@ -1,0 +1,21 @@
+{
+  "name": "nodedemo",
+  "version": "1.0.0",
+  "description": "初始化NodeJs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "berumotto",
+  "license": "ISC",
+  "dependencies": {
+    "css-loader": "^6.6.0",
+    "mysql": "^2.18.1",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.69.1"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "webpack-cli": "^4.9.2"
+  }
+}
