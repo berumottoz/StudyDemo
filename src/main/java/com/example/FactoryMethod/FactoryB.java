@@ -1,4 +1,4 @@
-package FactoryMethod;
+package com.example.FactoryMethod;
 
 public class FactoryB implements IFactory{
     @Override

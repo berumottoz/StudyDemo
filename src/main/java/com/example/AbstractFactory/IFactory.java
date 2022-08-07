@@ -1,4 +1,4 @@
-package AbstractFactory;
+package com.example.AbstractFactory;
 
 public interface IFactory {
     public ProductA GetProductA();

@@ -1,4 +1,4 @@
-package FactoryMethod;
+package com.example.FactoryMethod;
 
 public class ConcreteProductB implements IProduct{
 

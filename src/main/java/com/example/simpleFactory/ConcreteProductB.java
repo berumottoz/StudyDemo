@@ -1,4 +1,4 @@
-package simpleFactory;
+package com.example.simpleFactory;
 
 public class ConcreteProductB implements IProduct {
     public ConcreteProductB() {}

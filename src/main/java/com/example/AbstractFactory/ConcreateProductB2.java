@@ -1,4 +1,4 @@
-package AbstractFactory;
+package com.example.AbstractFactory;
 
 public class ConcreateProductB2 implements ProductB{
 
