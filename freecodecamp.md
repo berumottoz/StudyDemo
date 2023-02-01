@@ -1,4 +1,7 @@
 # freecodecamp学习笔记
+学习地址：[freecodecamp](https://www.freecodecamp.org/chinese/learn/)  
+测试代码：[replit](https://replit.com/@berumotto)  
+MongoDB Atlas: [MongoDB](https://cloud.mongodb.com/v2/63d8d829026e644370b1556c#/clusters)  
 
 ***
 ## 后端开发和 APIs
