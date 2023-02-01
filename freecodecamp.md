@@ -151,7 +151,219 @@ app.use(bodyParser.urlencoded({ extended: false }));
 #### 安装和设置 Mongoose
 1. 参照附件2 创建并链接MongoDB Atlas
 2. ```const mongoose = require('mongoose'); mongoose.connect(process.env.MONGO_URI);```
+
 #### 创建一个模型（Model）
+1. 首先，我们需要一个 Schema。 每一个 Schema 都对应一个 MongoDB 的 collection， 并且在相应的 collection 里定义 documents 的“样子”。
+```
+const Schema = mongoose.Schema;
+const personSchema = new Schema({
+  name: { type: String, required: true },
+  age: Number,
+  favoriteFoods: [String]
+});
+const Person = mongoose.model("Person", personSchema);
+```
+
+#### 创建并保存一条 Model 记录
+```
+const createAndSavePerson = (done) => {
+
+  var janeFonda = new Person({
+    name: "Jane Fonda",
+    age: 84,
+    favoriteFoods: ["eggs", "fish", "fresh fruit"]
+  });
+
+  janeFonda.save(function(err, data) {
+    if (err) {
+      return console.error(err);
+    }
+    done(null, data);
+  });
+
+};
+```
+
+#### 使用 model.create() 创建多条记录
+1. 在一些情况下，比如进行数据库初始化，你会需要创建很多 model 实例来用作初始数据。 Model.create() 接受一组像 [{name: 'John', ...}, {...}, ...] 的数组作为第一个参数，并将其保存到数据库。
+```
+  var arrayOfPeople = [
+    { name: "Frankie", age: 74, favoriteFoods: ["Del Taco"] },
+    { name: "Sol", age: 76, favoriteFoods: ["roast chicken"] },
+    { name: "Robert", age: 78, favoriteFoods: ["wine"] }
+  ];
+
+const createManyPeople = (arrayOfPeople, done) => {
+  Person.create(arrayOfPeople, function(err, data) {
+    if (err) {
+      return console.error(err);
+    }
+    done(null, data);
+  });
+};
+```
+
+#### 使用 model.find() 查询数据库
+```
+var findPeopleByName = function(personName, done) {
+  Person.find({ name: personName }, function(err, personFound) {
+    if (err) {
+      return console.error(err);
+    } else {
+      console.log(personFound);
+    }
+    done(null, personFound);
+  });
+};
+```
+
+#### model.findOne() 从数据库中返回一个单一匹配的 Document
+1. Model.findOne() 与 Model.find() 十分类似，但就算数据库中有很多条数据可以匹配查询条件，它也只返回一个 document，而不会返回一个数组， 如果查询条件是声明为唯一值的属性，它会更加适用。
+```
+const findOneByFood = (food, done) => {
+  Person.findOne({ favoriteFoods: food }, function(err, food) {
+    if (err) {
+      return console.error(err);
+    } else {
+      console.log(food);
+    }
+    done(null, food);
+  });
+};
+```
+
+#### 使用 model.findById() 方法，根据 _id 来搜索数据
+1. 在保存 document 的时候，MongoDB 会自动为它添加 _id 字段，并给该字段设置一个唯一的仅包含数字和字母的值。 通过 _id 搜索是一个十分常见的操作，为此，Mongoose 提供了一个专门的方法。
+```
+const findPersonById = (personId, done) => {
+  Person.findById(personId, function (err, person) {
+    if (err) {
+      return console.error(err);
+    } else {
+      console.log(person);
+    }
+    done(null, person);
+  });
+};
+```
+
+#### 通过执行查询、编辑、保存来执行经典更新流程
+1. Mongoose 有一个专用的更新方法 Model.update()， 它与底层的 mongo 驱动绑定。 通过这个方法，我们可以批量编辑符合特定条件的多个 document
+2. 这里面的update不会更新数据库，和数据库的交互还是需要通过save方法
+```
+const findEditThenSave = (personId, done) => {
+  const foodToAdd = "hamburger";
+
+  Person.findById(personId, function(err, person) {
+    if (err) {
+      return console.error(err);
+    } else {
+      person.update(person.favoriteFoods.push(foodToAdd));
+      person.save((err, person) => {
+        if (err) {
+          return console.error(err);
+        } else {
+          console.log(person);
+        }
+        done(null, person)
+      })
+    }
+  });
+};
+```
+
+#### 使用 model.findOneAndUpdate()的更新方式
+1. 我们使用 findByIdAndUpdate() 来进行基于 id 的搜索。
+2.  你需要返回更新后的 document。 你可以把 findOneAndUpdate() 的第三个参数设置为 { new: true } 。 默认情况下，这个方法会返回修改前的数据。
+```
+const findAndUpdate = (personName, done) => {
+  const ageToSet = 20;
+
+  Person.findOneAndUpdate(
+    { name: personName }, { age: ageToSet }, { new: true }, (err, updatedDoc) => {
+      if (err) {
+        return console.error(err);
+      } else {
+        console.log(updatedDoc);
+      }
+      done(null, updatedDoc);
+    })
+};
+```
+
+#### 使用 model.findByIdAndRemove 删除一个 document
+```
+var removeById = function(personId, done) {
+  Person.findByIdAndRemove(personId,(err, removedDoc) => {
+      if (err) {
+        return console.error(err);
+      } else {
+        console.log(removedDoc);
+      }
+      done(null, removedDoc);
+    }); 
+};
+```
+
+#### 使用 model.remove() 删除多个 document
+```
+const removeManyPeople = (done) => {
+  const nameToRemove = "Mary";
+
+  Person.remove({name: nameToRemove}, (err, removedDoc) => {
+    if (err) {
+      return console.error(err);
+    } else {
+      console.log(removedDoc);
+    }
+    done(null, removedDoc);
+  });
+};
+```
+
+#### 通过链式调用辅助查询函数来缩小搜索结果
+```
+const queryChain = (done) => {
+  const foodToSearch = "burrito";
+  Person.find({ favoriteFoods: foodToSearch })
+    .sort({ name: 1 })
+    .limit(2)
+    .select({ age: 0 })
+    .exec(function(err, people) {
+      if (err) {
+        return console.error(err);
+      } else {
+        console.log(people);
+      }
+      done(null, people);
+    });
+};
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## 附件
